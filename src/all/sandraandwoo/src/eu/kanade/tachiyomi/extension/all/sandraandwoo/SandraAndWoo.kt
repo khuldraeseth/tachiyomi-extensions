@@ -33,8 +33,8 @@ open class SandraAndWoo(
     protected open val thumbnail = "http://www.sandraandwoo.com/images/fanart/fanart-contest-2012/archie-the-redcat-02.jpg"
     protected open val archive = "/archive"
 
-    override fun fetchPopularManga(page: Int): Observable<MangasPage> {
-        val manga = SManga.create().apply {
+    private val manga: SManga
+        get() = SManga.create().apply {
             title = name
             artist = illustrator
             author = writer
@@ -45,6 +45,7 @@ open class SandraAndWoo(
             setUrlWithoutDomain(archive)
         }
 
+    override fun fetchPopularManga(page: Int): Observable<MangasPage> {
         val mangasPage = MangasPage(listOf(manga), false)
         return Observable.just(mangasPage)
     }
@@ -101,6 +102,8 @@ open class SandraAndWoo(
         return listOf(Page(0, "", "${baseUrl}$path"))
     }
 
+    override fun mangaDetailsParse(document: Document) = manga
+
     // <editor-fold desc="not used">
     override fun chapterFromElement(element: Element) = throw Exception("Not used")
 
@@ -113,8 +116,6 @@ open class SandraAndWoo(
     override fun latestUpdatesRequest(page: Int) = throw Exception("Not used")
 
     override fun latestUpdatesSelector() = throw Exception("Not used")
-
-    override fun mangaDetailsParse(document: Document) = throw Exception("Not used")
 
     override fun popularMangaFromElement(element: Element) = throw Exception("Not used")
 
