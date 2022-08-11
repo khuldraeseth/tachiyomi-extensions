@@ -56,11 +56,6 @@ open class SandraAndWoo(
 
     private fun roundHalfwayUp(x: Float) = (x + floor(x + 1)) / 2
 
-    protected open fun String.numbered(number: Float): String {
-        val numberStringified = "$number".removeSuffix(".0")
-        return "$numberStringified - $this"
-    }
-
     private fun chapterParse(element: Element, lastChapterNumber: Float): Pair<Float, SChapter> {
         val path = URI(element.attr("href")).path
         val dateMatch = CHAPTER_DATE_REGEX.matchEntire(path)!!
@@ -69,14 +64,15 @@ open class SandraAndWoo(
 
         val hover = element.attr("title")
         val titleMatch = CHAPTER_TITLE_REGEX.matchEntire(hover)!!
-        val (_, number, title, backupNumber) = titleMatch.groupValues
+        val (_, title, number, backupNumber) = titleMatch.groupValues
 
-        val chapterNumber = if (number.isNotEmpty()) number.toFloat()
-        else if (backupNumber.isNotEmpty()) backupNumber.toFloat()
-        else roundHalfwayUp(lastChapterNumber)
+        val chapterNumber =
+            if (number.isNotEmpty()) number.toFloat()
+            else if (backupNumber.isNotEmpty()) backupNumber.toFloat()
+            else roundHalfwayUp(lastChapterNumber)
         val chapter = SChapter.create().apply {
             url = path
-            name = title.numbered(chapterNumber)
+            name = title
             chapter_number = chapterNumber
             date_upload = date
         }
@@ -142,6 +138,6 @@ open class SandraAndWoo(
 
     companion object {
         private val CHAPTER_DATE_REGEX = Regex(""".*/(\d+)/(\d+)/(\d+)/[^/]*/""")
-        private val CHAPTER_TITLE_REGEX = Regex("""Permanent Link:\s*(?:\[(\d{4})])?\s((?:\[[^]]*(\d{4})])?.*)""")
+        private val CHAPTER_TITLE_REGEX = Regex("""Permanent Link:\s*((?:\[(\d{4})])?\s*(?:\[[^]]*(\d{4})])?.*)""")
     }
 }
