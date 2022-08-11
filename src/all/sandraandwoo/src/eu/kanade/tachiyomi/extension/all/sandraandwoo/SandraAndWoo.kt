@@ -16,22 +16,19 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.floor
 
-open class SandraAndWoo(
+abstract class SandraAndWoo(
     final override val baseUrl: String = "http://www.sandraandwoo.com",
-    final override val lang: String = "en",
-    dateFormat: String = "yyyy-MM-dd"
+    final override val lang: String,
 ) : ParsedHttpSource() {
-
-    override val name = "Sandra and Woo"
     override val supportsLatest = false
 
-    protected open val writer = "Oliver Knörzer"
-    protected open val illustrator = "Powree"
-    protected open val synopsis = "Sandra and Woo is a comedy comic strip featuring the 13-year-old girl Sandra North and her mischievous pet raccoon Woo. While most strips are just supposed to be funny or tell an exciting story, some also deal with more serious topics. We also want to show what growing up means for Sandra and her best friends in middle school, Cloud and Larisa. Another regular feature of the comic are Woo’s trips to the forest to meet his furry friends Shadow (a fox) and Sid (a squirrel) and his love interest Lily."
-    protected open val genres = "Comedy"
-    protected open val state = SManga.ONGOING
-    protected open val thumbnail = "http://www.sandraandwoo.com/images/fanart/fanart-contest-2012/archie-the-redcat-02.jpg"
-    protected open val archive = "/archive"
+    protected abstract val writer: String
+    protected abstract val illustrator: String
+    protected abstract val synopsis: String
+    protected abstract val genres: String
+    protected abstract val state: Int
+    protected abstract val thumbnail: String
+    protected abstract val archive: String
 
     private val manga: SManga
         get() = SManga.create().apply {
@@ -134,10 +131,11 @@ open class SandraAndWoo(
     override fun searchMangaSelector() = throw Exception("Not used")
     // </editor-fold>
 
-    private val dateFormat = SimpleDateFormat(dateFormat, Locale.ROOT)
-    private fun String.timestamp() = dateFormat.parse(this)?.time ?: 0L
+    private fun String.timestamp() = DATE_FORMAT.parse(this)?.time ?: 0L
 
     companion object {
+        private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
+
         private val CHAPTER_DATE_REGEX = Regex(""".*/(\d+)/(\d+)/(\d+)/[^/]*/""")
         private val CHAPTER_TITLE_REGEX = Regex("""Permanent Link:\s*((?:\[(\d{4})])?\s*(?:\[[^]]*(\d{4})])?.*)""")
     }
